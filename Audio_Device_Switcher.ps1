@@ -18,6 +18,7 @@
     <Window 
         Name="WindowProperties"
         WindowStartupLocation="CenterScreen" 
+        Top="100" Left="1000"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         Height="200" Width="1200" 
@@ -26,9 +27,9 @@
         WindowStyle = "None"
         AllowsTransparency = "true"
         Background="Black"
-        Opacity="0.7">
+        Opacity="0.75">
         <Grid Background="Transparent">
-            <TextBlock Name="DeviceSelectedText" FontSize="140" HorizontalAlignment="Center" Foreground="White" Text="Test Text"/>
+            <TextBlock Name="DeviceSelectedText" FontSize="140" HorizontalAlignment="Center" Foreground="White" Text="Placeholder"/>
         </Grid>
     </Window>
 '@
@@ -51,15 +52,19 @@ catch
 $Elements = @{}
 $xaml.SelectNodes("//*[@Name]") | %{ $Elements[$_.Name] = $Form.FindName($_.Name)}
 
+$DisplaySize=[System.Windows.Forms.SystemInformation]::PrimaryMonitorSize
+$NameLength = $DeviceName.length
+
 $OutputText = $Form.FindName("DeviceSelectedText")
 $OutputText.Text=$DeviceName
 $OutputText.FontSize=140
 
-$NameLength = $DeviceName.length
-
 $WindowProperties = $Form.FindName("WindowProperties")
 $WindowProperties.Width = ($OutputText.FontSize/1.8*$NameLength)
 $WindowProperties.Height = ($OutputText.FontSize*1.5)
+$WindowProperties.WindowStartupLocation="Manual"
+$WindowProperties.Top=$DisplaySize.Height/40
+$WindowProperties.Left=($DisplaySize.Width/2)-($WindowProperties.Width/2)
 
 $Script:Timer = New-Object System.Windows.Forms.Timer
 $Timer.Interval = 100
