@@ -5,17 +5,18 @@
 
  If ($AudioCurrentIndex -eq ($AudioList.length-1)){
     (Get-AudioDevice -list | Where-Object Name -eq ($AudioList[0]) | Set-AudioDevice).Name
-     $DeviceName = $AudioList[0].Split("(")[0]
+     $DeviceName = ($AudioList[0].Split("(")[0]).TrimEnd()
  }
 
  else {
     (Get-AudioDevice -list | Where-Object Name -eq ($AudioList[$AudioCurrentIndex+1]) | Set-AudioDevice).Name
-    $DeviceName = $AudioList[$AudioCurrentIndex+1].Split("(")[0]
+    $DeviceName = ($AudioList[$AudioCurrentIndex+1].Split("(")[0]).TrimEnd()
     
  }
 
 [xml]$xaml = @'
     <Window 
+        Name="WindowProperties"
         WindowStartupLocation="CenterScreen" 
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
@@ -27,7 +28,7 @@
         Background="Black"
         Opacity="0.7">
         <Grid Background="Transparent">
-            <TextBlock Name="DeviceSelectedText" FontSize="130" HorizontalAlignment="Center" Foreground="White" Text="Test Text"/>
+            <TextBlock Name="DeviceSelectedText" FontSize="140" HorizontalAlignment="Center" Foreground="White" Text="Test Text"/>
         </Grid>
     </Window>
 '@
@@ -48,10 +49,17 @@ catch
 }
 
 $Elements = @{}
-$xaml.SelectNodes("//*[@Name]") | %{ $Elements[$_.Name] = $Form.FindName($_.Name) }
+$xaml.SelectNodes("//*[@Name]") | %{ $Elements[$_.Name] = $Form.FindName($_.Name)}
 
-$output = $Form.FindName("DeviceSelectedText")
-$output.Text=$DeviceName
+$OutputText = $Form.FindName("DeviceSelectedText")
+$OutputText.Text=$DeviceName
+$OutputText.FontSize=140
+
+$NameLength = $DeviceName.length
+
+$WindowProperties = $Form.FindName("WindowProperties")
+$WindowProperties.Width = ($OutputText.FontSize/1.8*$NameLength)
+$WindowProperties.Height = ($OutputText.FontSize*1.5)
 
 $Script:Timer = New-Object System.Windows.Forms.Timer
 $Timer.Interval = 100
