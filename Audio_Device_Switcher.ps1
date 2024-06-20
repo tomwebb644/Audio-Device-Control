@@ -33,7 +33,7 @@
         </Grid>
     </Window>
 '@
-
+Add-Type -AssemblyName presentationCore
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName PresentationFramework
@@ -66,14 +66,17 @@ $WindowProperties.WindowStartupLocation="Manual"
 $WindowProperties.Top=$DisplaySize.Height/40
 $WindowProperties.Left=($DisplaySize.Width/2)-($WindowProperties.Width/2)
 
+$mediaPlayer = New-Object System.Windows.Media.MediaPlayer
+$mediaPlayer.open('C:\Windows\Media\Speech On.wav')
+$mediaPlayer.Play()
+
 $Script:Timer = New-Object System.Windows.Forms.Timer
-$Timer.Interval = 100
+$Timer.Interval = 1800
 
 Function Timer_Tick()
 {
 --$Script:CountDown
 
-(New-Object Media.SoundPlayer 'C:\Users\tomwe\Documents\Audio Device Changed.wav').PlaySync()
 
 If ($Script:CountDown -lt 0)
     {
