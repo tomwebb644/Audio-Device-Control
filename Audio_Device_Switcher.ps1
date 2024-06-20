@@ -21,27 +21,21 @@
  }
 
 [xml]$xaml = @'
-<Window 
-    WindowStartupLocation="CenterScreen" 
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-    Height="200" Width="1200" 
-    HorizontalAlignment="Center"   
-    VerticalAlignment="Top"
-    WindowStyle = "None"
-    AllowsTransparency = "true"
-    Background="Black"
-    Opacity="0.7">
-
-    <Grid Background="Transparent">
-    <TextBlock Name="DeviceSelectedText" FontSize="130" HorizontalAlignment="Center" Foreground="White"
-    Text="Test Text"
-    ></TextBlock>
-    </Grid>
-    
-
-</Window>
-    
+    <Window 
+        WindowStartupLocation="CenterScreen" 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        Height="200" Width="1200" 
+        HorizontalAlignment="Center"   
+        VerticalAlignment="Top"
+        WindowStyle = "None"
+        AllowsTransparency = "true"
+        Background="Black"
+        Opacity="0.7">
+        <Grid Background="Transparent">
+            <TextBlock Name="DeviceSelectedText" FontSize="130" HorizontalAlignment="Center" Foreground="White" Text="Test Text"/>
+        </Grid>
+    </Window>
 '@
 
 Add-Type -AssemblyName System.Windows.Forms
@@ -58,35 +52,33 @@ catch
 {
     Write-Host "Unable to load Windows.Markup.XamlReader. Some possible causes for this problem include: .NET Framework is missing PowerShell must be launched with PowerShell -sta, invalid XAML code was encountered."t
 }
+
 $Elements = @{}
 $xaml.SelectNodes("//*[@Name]") | %{ $Elements[$_.Name] = $Form.FindName($_.Name) }
 
 $output = $Form.FindName("DeviceSelectedText")
-
 $output.Text=$DisplayName
 
 $Script:Timer = New-Object System.Windows.Forms.Timer
-$Timer.Interval = 1000
+$Timer.Interval = 100
 
 Function Timer_Tick()
 {
 --$Script:CountDown
+
+(New-Object Media.SoundPlayer 'C:\Users\tomwe\Documents\Audio Device Changed.wav').PlaySync()
+
 If ($Script:CountDown -lt 0)
     {
     $Timer.Stop();
     $Form.Close();
     $Timer.Dispose();
-    $Script:CountDown = 5
     }
 }
 
-$Script:CountDown = 1
+$Script:CountDown = 0
 $Timer.Add_Tick({ Timer_Tick})
 $Timer.Start()
 
-(New-Object Media.SoundPlayer 'C:\Users\tomwe\Documents\Audio Device Changed.wav').PlaySync()
-
 $form.Topmost = "True"
-
 $Form.ShowDialog() | out-null
-
