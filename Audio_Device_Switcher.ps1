@@ -1,22 +1,23 @@
- $device1 = "G9 Monitor"
- $device2 = "HyperX Headset"
+ $device1 = "HyperX Headset"
+ $device2 = "G9 Monitor"
  $device3 = "TV"
 
+ $DeviceList = "HyperX Headset", "G9 Monitor", "TV"
  
- $Audio = Get-AudioDevice -playback
- 
- if ($Audio.Name.StartsWith($device1)) {
-     (Get-AudioDevice -list | Where-Object Name -like ("$device2*") | Set-AudioDevice).Name
-     $NewDevice=$device2
+ $AudioCurrent = (Get-AudioDevice -playback).Name
+ $AudioList =  (Get-AudioDevice -list | Where-Object Type -eq "Playback").Name
+ $AudioCurrentIndex = $AudioList.IndexOf($AudioCurrent)
+
+ If ($AudioCurrentIndex -eq ($AudioList.length-1)){
+    (Get-AudioDevice -list | Where-Object Name -eq ($AudioList[0]) | Set-AudioDevice).Name
+     $DeviceSplit = $AudioList[0].Split(" ")[0]
+     $DisplayName = $DeviceList -like $DeviceSplit+"*"
  }
 
- elseif ($Audio.Name.StartsWith($device2)) {
-     (Get-AudioDevice -list | Where-Object Name -like ("$device3*") | Set-AudioDevice).Name
-     $NewDevice=$device3
- }
  else {
-     (Get-AudioDevice -list | Where-Object Name -like ("$device1*") | Set-AudioDevice).Name
-     $NewDevice=$device1
+    (Get-AudioDevice -list | Where-Object Name -eq ($AudioList[$AudioCurrentIndex+1]) | Set-AudioDevice).Name
+    $DeviceSplit = $AudioList[$AudioCurrentIndex+1].Split(" ")[0]
+    $DisplayName = $DeviceList -like $DeviceSplit+"*"
  }
 
 [xml]$xaml = @'
@@ -62,7 +63,7 @@ $xaml.SelectNodes("//*[@Name]") | %{ $Elements[$_.Name] = $Form.FindName($_.Name
 
 $output = $Form.FindName("DeviceSelectedText")
 
-$output.Text=$NewDevice
+$output.Text=$DisplayName
 
 $Script:Timer = New-Object System.Windows.Forms.Timer
 $Timer.Interval = 1000
