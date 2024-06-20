@@ -1,23 +1,17 @@
- $device1 = "HyperX Headset"
- $device2 = "G9 Monitor"
- $device3 = "TV"
 
- $DeviceList = "HyperX Headset", "G9 Monitor", "TV"
- 
  $AudioCurrent = (Get-AudioDevice -playback).Name
  $AudioList =  (Get-AudioDevice -list | Where-Object Type -eq "Playback").Name
  $AudioCurrentIndex = $AudioList.IndexOf($AudioCurrent)
 
  If ($AudioCurrentIndex -eq ($AudioList.length-1)){
     (Get-AudioDevice -list | Where-Object Name -eq ($AudioList[0]) | Set-AudioDevice).Name
-     $DeviceSplit = $AudioList[0].Split(" ")[0]
-     $DisplayName = $DeviceList -like $DeviceSplit+"*"
+     $DeviceName = $AudioList[0].Split("(")[0]
  }
 
  else {
     (Get-AudioDevice -list | Where-Object Name -eq ($AudioList[$AudioCurrentIndex+1]) | Set-AudioDevice).Name
-    $DeviceSplit = $AudioList[$AudioCurrentIndex+1].Split(" ")[0]
-    $DisplayName = $DeviceList -like $DeviceSplit+"*"
+    $DeviceName = $AudioList[$AudioCurrentIndex+1].Split("(")[0]
+    
  }
 
 [xml]$xaml = @'
@@ -57,7 +51,7 @@ $Elements = @{}
 $xaml.SelectNodes("//*[@Name]") | %{ $Elements[$_.Name] = $Form.FindName($_.Name) }
 
 $output = $Form.FindName("DeviceSelectedText")
-$output.Text=$DisplayName
+$output.Text=$DeviceName
 
 $Script:Timer = New-Object System.Windows.Forms.Timer
 $Timer.Interval = 100
