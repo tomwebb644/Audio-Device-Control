@@ -52,7 +52,7 @@ catch
 $Elements = @{}
 $xaml.SelectNodes("//*[@Name]") | %{ $Elements[$_.Name] = $Form.FindName($_.Name)}
 
-$DisplaySize=[System.Windows.Forms.SystemInformation]::PrimaryMonitorSize
+$DisplaySize = Get-DisplayResolution []
 $NameLength = $DeviceName.length
 
 $OutputText = $Form.FindName("DeviceSelectedText")
@@ -63,8 +63,8 @@ $WindowProperties = $Form.FindName("WindowProperties")
 $WindowProperties.Width = ($OutputText.FontSize/1.8*$NameLength)
 $WindowProperties.Height = ($OutputText.FontSize*1.5)
 $WindowProperties.WindowStartupLocation="Manual"
-$WindowProperties.Top=$DisplaySize.Height/40
-$WindowProperties.Left=($DisplaySize.Width/2)-($WindowProperties.Width/2)
+$WindowProperties.Top=$DisplaySize.dmPelsHeight/40
+$WindowProperties.Left=($DisplaySize.dmPelsWidth/2)-($WindowProperties.Width/2)
 
 $mediaPlayer = New-Object System.Windows.Media.MediaPlayer
 $mediaPlayer.open('C:\Windows\Media\Speech On.wav')
